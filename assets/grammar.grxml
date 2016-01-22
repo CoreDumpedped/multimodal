@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE grammar PUBLIC "-//W3C//DTD GRAMMAR 1.0//EN"
+                "grammar.dtd">
+<!-- the default grammar language is FR  -->
+<grammar  version="1.0"
+          mode ="voice"
+          xmlns="http://www.w3.org/2001/06/grammar"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.w3.org/2001/06/grammar
+                              grammar.xsd"
+          xml:lang="fr-FR" root="answer" tag-format="semantics/1.0">
+          
+   <rule id="answer" scope="public"> 
+    <ruleref special="GARBAGE" /> 
+    <one-of>
+      <item><ruleref uri="#position"/></item>
+      <item><ruleref uri="#initialiser"/></item>
+	  <item><ruleref uri="#couleur"/></item>
+	  <item><ruleref uri="#selection"/></item>
+	  <item><ruleref uri="#mafemme"/></item>
+    </one-of>          
+    <tag>out = rules.latest().text;</tag>
+    <ruleref special="GARBAGE" />
+  </rule>
+       
+    <rule id="mafemme">
+      <item>Vous connaissez ma femme? </item>
+      <tag>out.text  = "Oui chef"</tag>
+  </rule>
+  
+  <rule id="initialiser">
+      <item>oh oh du con</item>
+      <tag>out.text  = "Action:" + meta.current().text;</tag>
+  </rule>
+  
+  <rule id="couleur">
+     <one-of>
+      <item>rouge</item>
+	  <item>noir</item>
+	     </one-of>
+      <tag>out.text  = "Action:couleur=" + meta.current().text;</tag>
+  </rule>
+  
+    <rule id="selection">
+	   <one-of>
+       <item>cette objet</item>
+	  <item>ce rectangle</item>
+	     </one-of>
+      <tag>out.text  = "Action:selection=" + meta.current().text;</tag>
+  </rule>
+  
+  
+  <rule id="position">
+    <one-of>
+      <item>ici</item>
+      <item>la</item>
+      <item>a cette position</item>
+    </one-of>      
+    <tag>out.text  = "Action:deplacement Position:" + meta.current().text;</tag>
+  </rule>
+  
+</grammar>
