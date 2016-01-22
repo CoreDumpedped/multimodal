@@ -5,6 +5,7 @@
  */
 package fusionmultimodal;
 
+import com.sun.glass.ui.EventLoop;
 import fr.dgac.ivy.Ivy;
 import fr.dgac.ivy.IvyClient;
 import fr.dgac.ivy.IvyException;
@@ -42,9 +43,9 @@ public class IvyStroke {
 
     private enum State {
 
-        save, run
+        learn, run
     };
-    private State state = State.save;
+    private State state = State.run;
     private MouseState etat;
     private VocalStat vocalStat;
     private Stroke s;
@@ -61,7 +62,7 @@ public class IvyStroke {
         dernierPoint=new Point(0, 0);
         bus = new Ivy("IvyStroke", "IvyStroke Ready", null);
 
-        bus.bindMsg("^Palette:mouseDragged x=(.*) y=(.*)", new IvyMessageListener() {
+        bus.bindMsg("^Palette:MouseDragged x=(.*) y=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {
                 if (etat == MouseState.release) {
                     etat = MouseState.drag;
@@ -76,7 +77,7 @@ public class IvyStroke {
             }
         });
 
-        bus.bindMsg("^Palette:MousePressed x=(.*) y=(.*)", new IvyMessageListener() {
+        bus.bindMsg("^Palette:MouseClicked x=(.*) y=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {
                 System.err.println("recup=" + dernierPoint.x );
                 dernierPoint.x=Integer.parseInt(args[0]);
@@ -86,12 +87,11 @@ public class IvyStroke {
 
         bus.bindMsg("^Palette:MouseReleased x=(.*) y=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {
-
                 etat = MouseState.release;
-                if (state == State.save) {
+                if (state == State.learn) {
                     recognizer.addTemplates(new Template("oval", s));
                     recognizer.saveTemplates();
-                } else {
+                } else if (s != null) {
                     System.out.println("START Verif Stroke ");
                     s.normalize();
                     recognizer.setStrokeCourant(s);
@@ -101,6 +101,7 @@ public class IvyStroke {
                         //  dessin(t);
                         templateEnAttente = t;
                         vocalStat = VocalStat.wait;
+                        s = null;
                     }
                 }
             }
@@ -144,9 +145,9 @@ public class IvyStroke {
 
     }
 
-    public void setRunState() {
-        state = State.run;
-        System.out.println("Etat RUN activé !");
+    public void setLearnState() {
+        state = State.learn;
+        System.out.println("Etat LEARN activé !");
     }
 
     private void envoieStroke() {
