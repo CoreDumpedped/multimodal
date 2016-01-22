@@ -79,6 +79,7 @@ public class IvyStroke {
                    Template t = recognizer.verifStroke();
                    if (t != null) {
                        System.out.println("Cette figure ressemblerai a s'y méprendre (et c'est peu de le dire !) à un :" + t.getNom());
+                       dessin(t);
                    }
                 }                
             }
@@ -87,6 +88,25 @@ public class IvyStroke {
         bus.start(null);
     }
 
+    
+    
+    public void dessin(Template t){   
+        System.out.println("dessine moi un " + t.getNom());
+     try {
+        switch (t.getNom()) {
+            case "carre" : 
+                bus.sendMsg("Palette:CreerRectangle x=10 y=20");
+                break;
+            case "oval" : 
+                bus.sendMsg("Palette:CreerEllipse x=10 y=20");
+        }
+      
+       System.out.println("all is ok");
+    } catch (IvyException ie) {
+      System.out.println("can't send my message !");
+    }
+        
+    }
     
       public void setRunState() {
         state = State.run;

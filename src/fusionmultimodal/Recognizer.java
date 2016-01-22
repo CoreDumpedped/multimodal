@@ -28,11 +28,10 @@ public class Recognizer {
         
     }
 
-    //todo
     public Template verifStroke() {
         getTemplates();
         Template closerTemplate = null;
-        double min = Double.MAX_VALUE;
+        double min = 500000;
         double dist;
         for (Template t : listTemplate) {
             dist = t.calculDistance(strokeCourant);
