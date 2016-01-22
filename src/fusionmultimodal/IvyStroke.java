@@ -70,12 +70,8 @@ public class IvyStroke {
             public void receive(IvyClient client, String[] args) {
                 etat = MouseState.release;
                 if (state == State.save) {
-                    try {
-                        Template t = new Template("rectangle", s);
-                        t.write(new PrintWriter(new File("listtemplate.txt")));
-                    } catch (FileNotFoundException ex) {
-                        Logger.getLogger(IvyStroke.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                       recognizer.addTemplates(new Template("rectangle", s));
+                       recognizer.saveTemplates();
                 } else {
                    
                 }

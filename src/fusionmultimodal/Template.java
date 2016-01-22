@@ -20,8 +20,9 @@ public class Template {
     public Stroke stroke;
     public String nom;
     
-    public Template(String nom, Stroke s) {
+    public Template(String nom, Stroke s) {     
         this.nom = nom;
+        s.normalize();
         this.stroke = s;
     }
     
@@ -36,7 +37,7 @@ public class Template {
         return dist;
     }
     
-    
+
     public void write(PrintWriter out)
     {
             out.print(nom);

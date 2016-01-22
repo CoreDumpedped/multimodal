@@ -27,6 +27,7 @@ public class Recognizer {
 
     }
 
+    //todo
     void verifStroke() {
 
     }
@@ -46,9 +47,16 @@ public class Recognizer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return (ArrayList<Template>) listTemplate;
     }
 
-    private void saveTemplates() {
+    
+    public void addTemplates(Template t){
+        listTemplate.add(t);
+    }
+    
+    
+   public void saveTemplates() {
         try {
             PrintWriter out = new PrintWriter(new FileWriter("templates.txt"));
             for (int i = 0; i < listTemplate.size(); i++) {
