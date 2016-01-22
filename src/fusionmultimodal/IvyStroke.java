@@ -35,17 +35,24 @@ public class IvyStroke {
     private enum MouseState {
         drag, release
     };
+    
+    private enum VocalStat{
+        init,wait
+    }
 
     private enum State {
         save, run
     };
     private State state = State.save;
     private MouseState etat;
-
+    private VocalStat vocalStat;
     private Stroke s;
+    private Template templateEnAttente;
+    private Point dernierPoint;
 
     Recognizer recognizer;
     public IvyStroke() throws IvyException {
+        vocalStat=VocalStat.init;
         recognizer=new Recognizer();
         etat = MouseState.release;
         listPoints = new ArrayList<>();
@@ -63,14 +70,23 @@ public class IvyStroke {
                 Point2D.Double p = new Point2D.Double(x, y);
                 // listPoints.add(new Point2D.Double(x, y));
                 s.addPoint(p);
+                vocalStat=VocalStat.init;
+            }
+        });
+        
+        
+                bus.bindMsg("^Palette:mousePressed x=(.*) y=(.*)", new IvyMessageListener() {
+            public void receive(IvyClient client, String[] args) {
+               
             }
         });
 
         bus.bindMsg("^Palette:MouseReleased x=(.*) y=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {
+                
                 etat = MouseState.release;
                 if (state == State.save) {
-                       recognizer.addTemplates(new Template("carre", s));
+                       recognizer.addTemplates(new Template("oval", s));
                        recognizer.saveTemplates();
                 } else {
                     System.out.println("START Verif Stroke ");
@@ -79,15 +95,39 @@ public class IvyStroke {
                    Template t = recognizer.verifStroke();
                    if (t != null) {
                        System.out.println("Cette figure ressemblerai a s'y méprendre (et c'est peu de le dire !) à un :" + t.getNom());
-                       dessin(t);
+                     //  dessin(t);
+                       templateEnAttente=t;
+                       vocalStat=VocalStat.wait;
                    }
                 }                
             }
         });
 
+        
+        
+          bus.bindMsg("^sra5 Text=(.*) Confidence", new IvyMessageListener() { //vocal
+            public void receive(IvyClient client, String[] args) {
+                System.out.println("je suis passer par ici:" + args[0]);
+                   if(args[0].equals("ici") ||args[0].equals("la") ||args[0].equals("... ici") ||args[0].equals("... la")  ){
+                       switch(vocalStat){
+                           case wait:        
+                               dessin(templateEnAttente);
+                               vocalStat=VocalStat.init;
+                               break;
+                           case init: break;  
+                       }
+                        
+                    }
+            }
+        });
+        
+        
+        
         bus.start(null);
     }
 
+    
+    
     
     
     public void dessin(Template t){   

@@ -116,7 +116,7 @@ public class Stroke
 			}
 		}
 		if(newPoints.size()<NB_POINTS)
-			newPoints.add(listePoint.get(newPoints.size()-1));
+			newPoints.add(listePoint.get(listePoint.size()-1));
 		return newPoints;
 	}
 	
