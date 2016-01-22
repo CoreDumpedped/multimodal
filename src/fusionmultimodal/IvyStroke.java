@@ -27,16 +27,16 @@ import javafx.scene.input.DragEvent;
  */
 public class IvyStroke {
 
+
+
     public Ivy bus;
     public List<Point2D.Double> listPoints;
 
     private enum MouseState {
-
         drag, release
     };
 
     private enum State {
-
         save, run
     };
     private State state = State.save;
@@ -46,6 +46,7 @@ public class IvyStroke {
 
     Recognizer recognizer;
     public IvyStroke() throws IvyException {
+        recognizer=new Recognizer();
         etat = MouseState.release;
         listPoints = new ArrayList<>();
         
@@ -61,7 +62,6 @@ public class IvyStroke {
                 double y = Double.parseDouble(args[1]);
                 Point2D.Double p = new Point2D.Double(x, y);
                 // listPoints.add(new Point2D.Double(x, y));
-                System.out.println("Point ajouté : x=" + x + " :y=" + y);
                 s.addPoint(p);
             }
         });
@@ -70,19 +70,29 @@ public class IvyStroke {
             public void receive(IvyClient client, String[] args) {
                 etat = MouseState.release;
                 if (state == State.save) {
-                       recognizer.addTemplates(new Template("rectangle", s));
+                       recognizer.addTemplates(new Template("carre", s));
                        recognizer.saveTemplates();
                 } else {
-                   
-                }
-                    
-                
+                    System.out.println("START Verif Stroke ");
+                   s.normalize();
+                   recognizer.setStrokeCourant(s);
+                   Template t = recognizer.verifStroke();
+                   if (t != null) {
+                       System.out.println("Cette figure ressemblerai a s'y méprendre (et c'est peu de le dire !) à un :" + t.getNom());
+                   }
+                }                
             }
         });
 
         bus.start(null);
     }
 
+    
+      public void setRunState() {
+        state = State.run;
+        System.out.println("Etat RUN activé !");
+    }
+    
     private void envoieStroke() {
         s.normalize();
     }

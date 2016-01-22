@@ -20,11 +20,7 @@ public class FusionMultiModal {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        try {
-            IvyStroke ivyStroke = new IvyStroke();
-        } catch (IvyException ex) {
-            Logger.getLogger(FusionMultiModal.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
     }
     
 }

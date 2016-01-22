@@ -24,19 +24,33 @@ public class Recognizer {
     Stroke strokeCourant;
 
     public Recognizer() {
-
+        listTemplate=new ArrayList<>();
+        
     }
 
     //todo
-    void verifStroke() {
-
+    public Template verifStroke() {
+        getTemplates();
+        Template closerTemplate = null;
+        double min = Double.MAX_VALUE;
+        double dist;
+        for (Template t : listTemplate) {
+            dist = t.calculDistance(strokeCourant);
+            System.out.println("Verification Stroke : distance avec le dessin : "
+                    + ""+ dist +" minumum : "+ min);
+            if (dist < min) {
+                min = dist;
+                closerTemplate = t;
+            }
+        } 
+        return closerTemplate;
     }
 
     public ArrayList<Template> getTemplates() {
         listTemplate = new ArrayList<Template>();
         BufferedReader in;
         try {
-            in = new BufferedReader(new FileReader("listTemplates.txt"));
+            in = new BufferedReader(new FileReader("stockage.txt"));
             String str;
             while ((str = in.readLine()) != null) {
                 if (!str.trim().equals("")) {
@@ -47,24 +61,32 @@ public class Recognizer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+                
+       
         return (ArrayList<Template>) listTemplate;
     }
 
     
     public void addTemplates(Template t){
+         System.out.println("ajout du " + t.nom + "dans la liste");
         listTemplate.add(t);
     }
     
     
    public void saveTemplates() {
         try {
-            PrintWriter out = new PrintWriter(new FileWriter("templates.txt"));
+            PrintWriter out = new PrintWriter(new FileWriter("stockage.txt",true));
             for (int i = 0; i < listTemplate.size(); i++) {
                 listTemplate.get(i).write(out);
             }
             out.close();
+            System.out.println("sauvegarde réussit");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-}
+   
+   public void setStrokeCourant (Stroke s) {
+       strokeCourant = s;
+   }
+} 

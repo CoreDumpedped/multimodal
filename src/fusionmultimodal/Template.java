@@ -28,7 +28,8 @@ public class Template {
     
     public double calculDistance(Stroke s) {
         		double dist = 0.0;
-        for(int i=1;i<s.size();i++)
+                        
+        for(int i=0; i<s.size() ;i++)
         {
             Point2D.Double p0 = s.getPoint(i);
             Point2D.Double p1 = this.stroke.getPoint(i);
@@ -47,7 +48,7 @@ public class Template {
                     Point2D.Double p = stroke.getPoint(i);
                     out.print(String.valueOf(p.getX()));
                     out.print(":");
-                    out.print(String.valueOf(p.getX()));
+                    out.print(String.valueOf(p.getY()));
                     out.print(" ");
             }
             out.println("");
@@ -67,4 +68,8 @@ public class Template {
             }
             return new Template(n, s);
     }    
+
+    public String getNom() {
+        return nom;
+    }
 }
