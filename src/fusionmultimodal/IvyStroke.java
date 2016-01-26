@@ -45,12 +45,18 @@ public class IvyStroke {
 
         learn, run
     };
+
+    private enum SelectionShape {
+
+        ALL, RECTANGLE, ELLIPSE
+    }
     private State state = State.run;
     private MouseState etat;
     private VocalStat vocalStat;
     private Stroke s;
     private Template templateEnAttente;
     private Point dernierPoint;
+    private List<String> selection;
 
     Recognizer recognizer;
 
@@ -59,7 +65,8 @@ public class IvyStroke {
         recognizer = new Recognizer();
         etat = MouseState.release;
         listPoints = new ArrayList<>();
-        dernierPoint=new Point(0, 0);
+        dernierPoint = new Point(0, 0);
+        selection = new ArrayList<>();
         bus = new Ivy("IvyStroke", "IvyStroke Ready", null);
 
         bus.bindMsg("^Palette:MouseDragged x=(.*) y=(.*)", new IvyMessageListener() {
@@ -79,10 +86,16 @@ public class IvyStroke {
 
         bus.bindMsg("^Palette:MouseClicked x=(.*) y=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {
-                System.err.println("recup=" + dernierPoint.x );
-                dernierPoint.x=Integer.parseInt(args[0]);
-                dernierPoint.y=Integer.parseInt(args[1]);
+                System.err.println("recup=" + dernierPoint.x);
+                dernierPoint.x = Integer.parseInt(args[0]);
+                dernierPoint.y = Integer.parseInt(args[1]);
+                try {
+                    testerObjet();
+                } catch (IvyException ex) {
+                    Logger.getLogger(IvyStroke.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+
         });
 
         bus.bindMsg("^Palette:MouseReleased x=(.*) y=(.*)", new IvyMessageListener() {
@@ -107,35 +120,110 @@ public class IvyStroke {
             }
         });
 
-        bus.bindMsg("^sra5 Text=(.*) Confidence", new IvyMessageListener() { //vocal
-            public void receive(IvyClient client, String[] args) {
-                System.out.println("je suis passer par ici:" + args[0]);
-                if (args[0].equals("ici") || args[0].equals("la") || args[0].equals("... ici") || args[0].equals("... la")) {
-                    switch (vocalStat) {
-                        case wait:
-                            dessin(templateEnAttente);
-                            vocalStat = VocalStat.init;
-                            break;
-                        case init:
-                            break;
-                    }
+        /*bus.bindMsg("^sra5 Text=(.*) Confidence", new IvyMessageListener() { //vocal
+         public void receive(IvyClient client, String[] args) {
+         System.out.println("je suis passer par ici:" + args[0]);
+         if (args[0].equals("ici") || args[0].equals("la") || args[0].equals("... ici") || args[0].equals("... la")) {
+         switch (vocalStat) {
+         case wait:
+         action(templateEnAttente);
+         vocalStat = VocalStat.init;
+         break;
+         case init:
+         break;
+         }
 
+         }
+         }
+         });*/
+        bus.bindMsg("^sra5 Parsed=Action:position", new IvyMessageListener() { //vocal
+            public void receive(IvyClient client, String[] args) {
+                switch (vocalStat) {
+                    case wait:
+                        action(templateEnAttente);
+                        vocalStat = VocalStat.init;
+                        break;
+                    case init:
+                        break;
                 }
+
             }
         });
+
+        bus.bindMsg("^sra5 Parsed=Action:selection=(.*) Confidence", new IvyMessageListener() { //vocal
+            public void receive(IvyClient client, String[] args) {
+                System.out.println(args[0]);
+                try {
+                    switch (args[0]) {
+                        case "ce rectangle":
+                            supprimer(SelectionShape.RECTANGLE);
+                            break;
+                        case "cette ellipse":
+                            supprimer(SelectionShape.ELLIPSE);
+                            break;
+                        case "cet objet":
+                            supprimer(SelectionShape.ALL);
+                    }
+
+                } catch (IvyException ex) {
+                    Logger.getLogger(IvyStroke.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+        });
+
+        bus.bindMsg("Palette:ResultatTesterPoint x=(.*) y=(.*) nom=(.*)", new IvyMessageListener() { //regarder les objet sous un point
+
+            public void receive(IvyClient client, String[] args) {
+                selection.add(args[2]);
+                System.err.println("selection=" + args[2]);
+            }
+        }
+        );
 
         bus.start(null);
     }
 
-    public void dessin(Template t) {
+    private void supprimer(SelectionShape selectionShape) throws IvyException {
+        System.out.println(selectionShape.toString());
+        if (!selection.isEmpty()) {
+            switch (selectionShape) {
+                case ALL:
+                    bus.sendMsg("Palette:SupprimerObjet nom=" + selection.get(0));
+                    break;
+                case RECTANGLE:
+                    for (String str : selection) {
+                        if (str.charAt(0) == 'R') {
+                            bus.sendMsg("Palette:SupprimerObjet nom=" + str);
+                            break;
+                        }
+                    }
+                    break;
+                case ELLIPSE:
+                    for (String str : selection) {
+                        if (str.charAt(0) == 'E') {
+                            bus.sendMsg("Palette:SupprimerObjet nom=" + str);
+                            break;
+                        }
+                    }
+                    break;
+            }
+            //on supprime l'objet
+            selection.clear();
+        }
+    }
+
+    public void action(Template t) {
         System.out.println("dessine moi un " + t.getNom());
         try {
             switch (t.getNom()) {
                 case "carrer":
-                    bus.sendMsg("Palette:CreerRectangle x="+dernierPoint.x +" y="+dernierPoint.y);
+                    bus.sendMsg("Palette:CreerRectangle x=" + dernierPoint.x + " y=" + dernierPoint.y);
                     break;
                 case "oval":
-                    bus.sendMsg("Palette:CreerEllipse x="+dernierPoint.x +" y="+dernierPoint.y);
+                    bus.sendMsg("Palette:CreerEllipse x=" + dernierPoint.x + " y=" + dernierPoint.y);
+                case "croix":
+                    delete(dernierPoint.x, dernierPoint.y);
             }
 
             System.out.println("all is ok");
@@ -145,6 +233,17 @@ public class IvyStroke {
 
     }
 
+    public void delete(double x, double y) throws IvyException {
+        System.out.println("suppression");
+        bus.sendMsg("Palette:TesterPoint x=" + (int) x + " y=" + (int) y);
+
+        if (!selection.isEmpty()) {
+
+            bus.sendMsg("Palette:SupprimerObjet nom=" + selection.get(0));    //on supprime l'objet
+            selection.clear();
+        }
+    }
+
     public void setLearnState() {
         state = State.learn;
         System.out.println("Etat LEARN activé !");
@@ -152,6 +251,10 @@ public class IvyStroke {
 
     private void envoieStroke() {
         s.normalize();
+    }
+
+    private void testerObjet() throws IvyException {
+        bus.sendMsg("Palette:TesterPoint x=" + (int) dernierPoint.x + " y=" + (int) dernierPoint.y);
     }
 
 }

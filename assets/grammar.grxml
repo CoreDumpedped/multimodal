@@ -43,8 +43,9 @@
   
     <rule id="selection">
 	   <one-of>
-       <item>cette objet</item>
-	  <item>ce rectangle</item>
+       <item>cet objet</item>
+	   <item>ce rectangle</item>
+	   <item>cette ellipse</item>
 	     </one-of>
       <tag>out.text  = "Action:selection=" + meta.current().text;</tag>
   </rule>
@@ -56,7 +57,7 @@
       <item>la</item>
       <item>a cette position</item>
     </one-of>      
-    <tag>out.text  = "Action:deplacement Position:" + meta.current().text;</tag>
+    <tag>out.text  = "Action:position"</tag>
   </rule>
   
 </grammar>
