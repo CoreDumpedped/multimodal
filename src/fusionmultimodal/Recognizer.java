@@ -35,8 +35,8 @@ public class Recognizer {
         double dist;
         for (Template t : listTemplate) {
             dist = t.calculDistance(strokeCourant);
-            System.out.println("Verification Stroke : distance avec le dessin : "
-                    + ""+ dist +" minumum : "+ min);
+        //    System.out.println("Verification Stroke : distance avec le dessin : "
+         //           + ""+ dist +" minumum : "+ min);
             if (dist < min) {
                 min = dist;
                 closerTemplate = t;
