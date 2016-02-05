@@ -15,6 +15,7 @@ import java.util.logging.Logger;
  */
 public class RecognizerFrame extends javax.swing.JFrame {
     IvyStroke ivyStroke;
+    IvyRecognizer ivyRecognizer;
     /**
      * Creates new form NewJFrame
      */
@@ -23,6 +24,8 @@ public class RecognizerFrame extends javax.swing.JFrame {
         initComponents();
         try {
             ivyStroke = new IvyStroke();
+            ivyRecognizer = new IvyRecognizer();
+            
         } catch (IvyException ex) {
             Logger.getLogger(FusionMultiModal.class.getName()).log(Level.SEVERE, null, ex);
         }
