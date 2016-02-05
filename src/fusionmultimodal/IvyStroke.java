@@ -50,6 +50,7 @@ public class IvyStroke {
     private Template templateEnAttente;
     private Point dernierPoint;
     private List<String> selection;
+
     private boolean deleteState=false;
     Recognizer recognizer;
     private Etat etat;
@@ -81,6 +82,7 @@ public class IvyStroke {
                 }
             }
         });
+
         
         //todo la bonne syntaxd
         bus.bindMsg("reception objet", new IvyMessageListener() {
@@ -100,6 +102,7 @@ public class IvyStroke {
                     default:
                         System.err.println("j'ai pas comprit la forme");
                         break;
+
                 }
             }
         });

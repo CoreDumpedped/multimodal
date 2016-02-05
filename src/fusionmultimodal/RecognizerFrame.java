@@ -8,6 +8,7 @@ package fusionmultimodal;
 import fr.dgac.ivy.IvyException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -15,14 +16,20 @@ import java.util.logging.Logger;
  */
 public class RecognizerFrame extends javax.swing.JFrame {
     IvyStroke ivyStroke;
+    IvyRecognizer ivyRecognizer;
+    boolean isLearn = false;
     /**
      * Creates new form NewJFrame
      */
     public RecognizerFrame() {
         
         initComponents();
+       
+   
         try {
             ivyStroke = new IvyStroke();
+            ivyRecognizer = new IvyRecognizer();
+            
         } catch (IvyException ex) {
             Logger.getLogger(FusionMultiModal.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -69,7 +76,16 @@ public class RecognizerFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
-       ivyStroke.setLearnState();
+        if (!isLearn) {
+             ivyRecognizer.setLearnState(true);
+             jButton1.setText("Mode Run");
+             isLearn = true;
+        } else {
+            ivyRecognizer.setLearnState(false);
+             jButton1.setText("Mode Learn");
+             isLearn = false;
+        }
+       
     }//GEN-LAST:event_jButton1MouseClicked
 
     /**
