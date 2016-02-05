@@ -65,6 +65,7 @@ public class IvyStroke {
         bus = new Ivy("IvyStroke", "IvyStroke Ready", null);
 
         bus.bindMsg("^Palette:MouseClicked x=(.*) y=(.*)", new IvyMessageListener() {
+          
             public void receive(IvyClient client, String[] args) {      
                 switch(etat){
                     case init:
@@ -85,7 +86,7 @@ public class IvyStroke {
 
         
         //todo la bonne syntaxd
-        bus.bindMsg("Recognizer:Forme nom=^(.*)", new IvyMessageListener() {
+        bus.bindMsg("^Recognizer:Forme nom=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {  
                 String forme=args[0];
              
@@ -202,6 +203,7 @@ public class IvyStroke {
     private void sauvegarderPoint(int x,int y){
         dernierPoint.x = x;
         dernierPoint.y = y;
+          System.out.println("mouse click");
         try {
             testerObjet();
         } catch (IvyException ex) {
