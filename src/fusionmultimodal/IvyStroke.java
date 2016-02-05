@@ -59,7 +59,7 @@ public class IvyStroke {
     private Point dernierPoint;
     private List<String> selection;
     private SelectionShape ss;
-private boolean deleteState=false;
+    private boolean deleteState=false;
     Recognizer recognizer;
 
     public IvyStroke() throws IvyException {
@@ -107,7 +107,6 @@ private boolean deleteState=false;
                     recognizer.addTemplates(new Template("oval", s));
                     recognizer.saveTemplates();
                 } else if (s != null) {
-
                     s.normalize();
                     recognizer.setStrokeCourant(s);
                     Template t = recognizer.verifStroke();
