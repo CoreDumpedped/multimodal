@@ -32,6 +32,11 @@ public class IvyStroke {
     public List<Point2D.Double> listPoints;
 
 
+    private enum State {
+
+        learn, run
+    };
+
     
     private enum SelectionShape {
         ALL, RECTANGLE, ELLIPSE
@@ -39,6 +44,7 @@ public class IvyStroke {
     
     private enum Etat{init,carrer,rond,croix};
     
+    private State state = State.run;
 
     private Stroke s;
     private Template templateEnAttente;
@@ -171,20 +177,6 @@ public class IvyStroke {
 
 
     
-    
-    /*
-     public void delete(double x, double y) throws IvyException {
-     System.out.println("suppression");
-     bus.sendMsg("Palette:TesterPoint x=" + (int) x + " y=" + (int) y);
-
-     if (!selection.isEmpty()) {
-
-     bus.sendMsg("Palette:SupprimerObjet nom=" + selection.get(0));    //on supprime l'objet
-     selection.clear();
-     }
-     }
-     */
-
     public void setLearnState() {
         state = State.learn;
         System.out.println("Etat LEARN activé !");
