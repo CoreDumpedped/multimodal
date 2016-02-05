@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fusionmultimodal;
+package fusionmultimodal.recognizer;
 
 import fr.dgac.ivy.Ivy;
 import fr.dgac.ivy.IvyClient;
 import fr.dgac.ivy.IvyException;
 import fr.dgac.ivy.IvyMessageListener;
+import fusionmultimodal.Stroke;
+import fusionmultimodal.Template;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.logging.Level;

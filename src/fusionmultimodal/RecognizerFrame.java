@@ -5,6 +5,7 @@
  */
 package fusionmultimodal;
 
+import fusionmultimodal.recognizer.IvyRecognizer;
 import fr.dgac.ivy.IvyException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
