@@ -85,7 +85,7 @@ public class IvyStroke {
 
         
         //todo la bonne syntaxd
-        bus.bindMsg("reception objet", new IvyMessageListener() {
+        bus.bindMsg("Recognizer:Forme nom=^(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {  
                 String forme=args[0];
              
