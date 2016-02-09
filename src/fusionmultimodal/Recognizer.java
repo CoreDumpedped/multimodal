@@ -59,9 +59,7 @@ public class Recognizer {
             in.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-                
-       
+        }     
         return (ArrayList<Template>) listTemplate;
     }
 

@@ -1,6 +1,1 @@
-carre NaN:NaN NaN:NaN 
-carre NaN:NaN NaN:NaN 
-oval NaN:NaN NaN:NaN 
-carre NaN:NaN NaN:NaN 
-oval NaN:NaN NaN:NaN 
-croix NaN:NaN NaN:NaN 
+

@@ -193,6 +193,7 @@ public class IvyStroke {
     }
 
     private void testerObjet() throws IvyException {
+        System.out.println("testeObject()");
         bus.sendMsg("Palette:TesterPoint x=" + (int) dernierPoint.x + " y=" + (int) dernierPoint.y);
     }
     
