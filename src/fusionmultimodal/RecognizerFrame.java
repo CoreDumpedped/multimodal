@@ -32,7 +32,7 @@ public class RecognizerFrame extends javax.swing.JFrame {
             ivyRecognizer = new IvyRecognizer();
             
         } catch (IvyException ex) {
-            Logger.getLogger(FusionMultiModal.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RecognizerFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
