@@ -45,12 +45,11 @@ public class IvyStroke {
     private enum Etat{init,carrer,rond,croix,deplacer};
     
     private State state = State.run;
-
     private Stroke s;
     private Template templateEnAttente;
     private Point dernierPoint;
+    private Point pointSelection;
     private List<String> selection;
-
     private boolean deleteState=false;
     Recognizer recognizer;
     private Etat etat;
@@ -79,6 +78,7 @@ public class IvyStroke {
                     case rond:
                         sauvegarderPoint(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
                     case deplacer:
+                        //pointSelection=new Point(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
                         sauvegarderPoint(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
                         break;
                 }
@@ -86,7 +86,7 @@ public class IvyStroke {
         });
 
         
-        //todo la bonne syntaxd
+        //reconnaissance de la forme
         bus.bindMsg("^Recognizer:Forme nom=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {
                 String forme=args[0];   
@@ -125,7 +125,8 @@ public class IvyStroke {
                     case rond:
                         dessineMoiunRond();
                         break;
-                    default:             
+                    default:
+                        deplacement();
                         break;
                 }
             }
@@ -141,6 +142,14 @@ public class IvyStroke {
                         break;
                     case deplacer:
                         System.out.println("deplacement");
+                {
+                    try {
+                        //demande d'info
+                        bus.sendMsg("Palette:DemanderInfo nom=" + selection.get(0));
+                    } catch (IvyException ex) {
+                        Logger.getLogger(IvyStroke.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
                         deplacement(args[0]);
                         break;
                     default:
@@ -156,11 +165,60 @@ public class IvyStroke {
             }
         }
         );
+        
+        
+      //recuper les infos sur l'objet selectionner   
+        bus.bindMsg("Palette:Info nom=(.*) x=(.*) y=(.*) lo(.*) ", new IvyMessageListener() { 
+            public void receive(IvyClient client, String[] args) {
+                System.out.println("sauvegarde de la demande d'info");
+                pointSelection=new Point(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+            }
+        }
+        );    
+        
+        
+        
+        
         bus.start(null);
     }
 
-    
-        private void suppression(String objet) {
+    /**
+     * demande les informations des objets selectionner
+     * @param objet
+     * @throws IvyException 
+     */
+    private void demandeInfo(String objet) throws IvyException {
+        if (!selection.isEmpty()) {
+              switch (objet) {
+                  case "ce rectangle":
+                      for (String str : selection) {
+                          if (str.charAt(0) == 'R') {
+                              bus.sendMsg("Palette:DemanderInfo nom=" + str);
+                              selection.clear();
+                              break;
+                          }
+                      }
+                      break;
+                  case "cette ellipse":
+                      for (String str : selection) {
+                          if (str.charAt(0) == 'E') {
+                              bus.sendMsg("Palette:DemanderInfo nom=" + str);
+                              selection.clear();
+                              break;
+                          }
+                      }
+                      break;
+                  case "cet objet":
+                       bus.sendMsg("Palette:DemanderInfo nom=" + selection.get(0));
+                      break;
+              }
+        }else{
+            System.out.println("SELECTION VIDE");
+        }
+
+    }
+
+    private void suppression(String objet) {
         try {
             System.out.println("suppression=" + objet);
             switch (objet) {
@@ -171,7 +229,6 @@ public class IvyStroke {
                     supprimer(SelectionShape.ELLIPSE);
                     break;
                 case "cet objet":
-                    System.out.println("cet objet va vraiment etre supprimer");
                     supprimer(SelectionShape.ALL);
                     break;
             }
@@ -183,7 +240,6 @@ public class IvyStroke {
     private void supprimer(SelectionShape selectionShape) throws IvyException {
        
         if (!selection.isEmpty() && deleteState==true) {
-            System.out.println("dans le if");
             switch (selectionShape) {
                 case ALL:
                     System.out.println("Tout va disparaitre");
@@ -209,7 +265,6 @@ public class IvyStroke {
                     }
                     break;
             }
-                System.out.println("dehors");
             //on supprime l'objet
            
         }
@@ -262,8 +317,14 @@ public class IvyStroke {
         }
     }
     
-    
-    private void supprimerRectangle(SelectionShape selectionShape,int x,int y) throws IvyException {
+    /**
+     * 
+     * @param x
+     * @param y
+     * @throws IvyException 
+     */
+    private void deplacerRectangle(int x,int y) throws IvyException {
+        System.out.println("deplacer rectangle");
         for (String str : selection) {
             if (str.charAt(0) == 'R') {
                 bus.sendMsg("Palette:DeplacerObjet nom=" + str + " x=" +x + " y=" + y);
@@ -271,7 +332,18 @@ public class IvyStroke {
                 break;
             }
         }
-
+    }
+    
+    
+    private void deplacerEllipse(int x,int y) throws IvyException {
+        System.out.println("deplacer ellipse");
+        for (String str : selection) {
+            if (str.charAt(0) == 'E') {
+                bus.sendMsg("Palette:DeplacerObjet nom=" + str + " x=" +x + " y=" + y);
+                selection.clear();
+                break;
+            }
+        }
     }
     
     /**
@@ -280,23 +352,63 @@ public class IvyStroke {
      */
     private void deplacement(String objet) {
         try {
-            System.out.println("Deplacement=" + objet);
-            
+            Point p;
+            System.out.println("Deplacement=" + objet);    
             switch (objet) {
                 case "ce rectangle":
-                    supprimerRectangle(SelectionShape.RECTANGLE,10,10); //TODO BON COORDONNER
+                    p=calculeDeplacement();
+                    deplacerRectangle(p.x,p.y); //TODO BON COORDONNER
                     break;
                 case "cette ellipse":
-                    
+                      p=calculeDeplacement();
+                    deplacerEllipse(p.x,p.y);
                     break;
                 case "cet objet":
-                    
+                      p=calculeDeplacement();
+                    bus.sendMsg("Palette:DeplacerObjet nom=" + selection.get(0) + " x=" + p.x + " y=" + p.y);
+                    break;
+                default:
+                    System.out.println("AUCUN OBJET SELECTIONNER");
                     break;
             }
         } catch (IvyException ex) {
             Logger.getLogger(IvyStroke.class.getName()).log(Level.SEVERE, null, ex);
         }
           
+    }
+    
+    
+        /**
+     * fonction de deplacement
+     * @param arg 
+     */
+    private void deplacement() {
+            Point p;
+            if(!selection.isEmpty()){
+            try {
+                p=calculeDeplacement(); 
+                bus.sendMsg("Palette:DeplacerObjet nom=" + selection.get(0) + " x=" + p.x + " y=" + p.y);
+            } catch (IvyException ex) {
+                Logger.getLogger(IvyStroke.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            }else{
+               System.out.println("AUCUN OBJET SELECTIONNER");  
+            }   
+    }
+    
+    
+    
+    
+    
+    /**
+     * calcule la distance entre la selection et le dernier point selectionner
+    */
+    private Point calculeDeplacement(){  
+        System.out.println("calculeDéplacement");
+        if(pointSelection!=null){
+            return new Point(pointSelection.x-dernierPoint.x,pointSelection.y-dernierPoint.y);
+        }
+       return new Point(0,0);
     }
     
 
