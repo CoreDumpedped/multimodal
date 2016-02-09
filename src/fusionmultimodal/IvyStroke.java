@@ -88,8 +88,9 @@ public class IvyStroke {
         bus.bindMsg("^Recognizer:Forme nom=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {
                 String forme=args[0];   
+                System.out.println("forme reconnue: " + forme);
                 switch(forme){
-                    case "carre":
+                    case "carrer":
                         etat=Etat.carrer;
                         break;
                     case "oval":
@@ -101,14 +102,14 @@ public class IvyStroke {
                     default:
                         System.err.println("j'ai pas comprit la forme");
                         break;
-
                 }
             }
         });
 
 // a la reception de ici ou la ect
-        bus.bindMsg("^sra5 Parsed=Action:position", new IvyMessageListener() { //vocal
+        bus.bindMsg("^sra5 Parsed=Action:position(.*)", new IvyMessageListener() { //vocal
             public void receive(IvyClient client, String[] args) {
+                System.out.println("dessine moi un...");
                 switch(etat){
                     case carrer:
                         dessineMoiunCarrer();
@@ -117,6 +118,7 @@ public class IvyStroke {
                         dessineMoiunRond();
                         break;
                     default:
+                        //TODO SUPPRIUMER
                         break;
                 }
             }
