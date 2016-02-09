@@ -57,7 +57,7 @@ public class IvyRecognizer {
             }
         });
 
-        bus.bindMsg("^Palette:mouseDragged x=(.*) y=(.*)", new IvyMessageListener() {
+        bus.bindMsg("^Palette:MouseDragged x=(.*) y=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {
                 switch (s) {
                     case I:
@@ -75,7 +75,6 @@ public class IvyRecognizer {
 
         bus.bindMsg("^Palette:MouseReleased x=(.*) y=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {
-                System.out.println("");
                 switch (s) {
                     case I:
                         //Impossible
@@ -102,10 +101,7 @@ public class IvyRecognizer {
                         }
                         break;
                 }
-
-            }
-
-            
+            }           
         });
         
         bus.start(null);
