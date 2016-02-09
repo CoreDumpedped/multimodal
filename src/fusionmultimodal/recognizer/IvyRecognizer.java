@@ -57,7 +57,7 @@ public class IvyRecognizer {
             }
         });
 
-        bus.bindMsg("^Palette:mouseDragged x=(.*) y=(.*)", new IvyMessageListener() {
+        bus.bindMsg("^Palette:MouseDragged x=(.*) y=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {
                 switch (s) {
                     case I:
