@@ -5,6 +5,7 @@
  */
 package fusionmultimodal;
 
+import fusionmultimodal.recognizer.IvyRecognizer;
 import fr.dgac.ivy.IvyException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,7 +32,7 @@ public class RecognizerFrame extends javax.swing.JFrame {
             ivyRecognizer = new IvyRecognizer();
             
         } catch (IvyException ex) {
-            Logger.getLogger(FusionMultiModal.class.getName()).log(Level.SEVERE, null, ex);
+           // Logger.getLogger(FusionMultiModal.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

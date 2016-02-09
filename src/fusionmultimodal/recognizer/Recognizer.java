@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fusionmultimodal;
+package fusionmultimodal.recognizer;
 
 import java.util.List;
 import fusionmultimodal.Stroke;
+import fusionmultimodal.Stroke;
+import fusionmultimodal.Template;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;

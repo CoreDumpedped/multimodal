@@ -5,6 +5,7 @@
  */
 package fusionmultimodal;
 
+import fusionmultimodal.recognizer.Recognizer;
 import com.sun.glass.ui.EventLoop;
 import fr.dgac.ivy.Ivy;
 import fr.dgac.ivy.IvyClient;
