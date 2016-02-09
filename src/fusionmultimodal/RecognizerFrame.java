@@ -19,6 +19,7 @@ public class RecognizerFrame extends javax.swing.JFrame {
     IvyStroke ivyStroke;
     IvyRecognizer ivyRecognizer;
     boolean isLearn = false;
+    
     /**
      * Creates new form NewJFrame
      */
@@ -26,7 +27,7 @@ public class RecognizerFrame extends javax.swing.JFrame {
         
         initComponents();
        
-   
+  
         try {
             ivyStroke = new IvyStroke();
             ivyRecognizer = new IvyRecognizer();

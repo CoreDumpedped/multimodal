@@ -34,7 +34,6 @@ public class IvyStroke {
 
 
     private enum State {
-
         learn, run
     };
 
@@ -65,8 +64,7 @@ public class IvyStroke {
         selection = new ArrayList<>();
         bus = new Ivy("IvyStroke", "IvyStroke Ready", null);
 
-        bus.bindMsg("^Palette:MouseClicked x=(.*) y=(.*)", new IvyMessageListener() {
-          
+        bus.bindMsg("^Palette:MouseClicked x=(.*) y=(.*)", new IvyMessageListener() {       
             public void receive(IvyClient client, String[] args) {      
                 switch(etat){
                     case init:
@@ -88,11 +86,8 @@ public class IvyStroke {
         
         //todo la bonne syntaxd
         bus.bindMsg("^Recognizer:Forme nom=(.*)", new IvyMessageListener() {
-
             public void receive(IvyClient client, String[] args) {
-                System.out.println("args :" +args[0]);
-                String forme=args[0];
-             
+                String forme=args[0];   
                 switch(forme){
                     case "carre":
                         etat=Etat.carrer;
