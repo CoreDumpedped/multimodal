@@ -42,7 +42,7 @@ public class IvyStroke {
         ALL, RECTANGLE, ELLIPSE
     }
     
-    private enum Etat{init,carrer,rond,croix};
+    private enum Etat{init,carrer,rond,croix,deplacer};
     
     private State state = State.run;
 
@@ -78,6 +78,8 @@ public class IvyStroke {
                         break;
                     case rond:
                         sauvegarderPoint(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+                    case deplacer:
+                        sauvegarderPoint(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
                         break;
                 }
             }
@@ -102,6 +104,10 @@ public class IvyStroke {
                         etat=Etat.croix;
                         deleteState = true;
                         break;
+                    case "vague":
+                        etat=Etat.deplacer;
+                        deleteState = false;
+                        break;
                     default:
                         System.err.println("j'ai pas comprit la forme");
                         break;
@@ -112,7 +118,6 @@ public class IvyStroke {
 // a la reception de ici ou la ect
         bus.bindMsg("^sra5 Parsed=Action:position(.*)", new IvyMessageListener() { //vocal
             public void receive(IvyClient client, String[] args) {
-                System.out.println("dessine moi un...");
                 switch(etat){
                     case carrer:
                         dessineMoiunCarrer();
@@ -120,21 +125,23 @@ public class IvyStroke {
                     case rond:
                         dessineMoiunRond();
                         break;
-                    default:
-                        //TODO SUPPRIUMER
+                    default:             
                         break;
                 }
             }
         });
 
         
-        // a la reception de cette objet,cette elipse pour la suppression ou deplacement
+        // a la reception de cette objet,cette ellipse pour la suppression ou deplacement
         bus.bindMsg("^sra5 Parsed=Action:selection=(.*) Confidence(.*)", new IvyMessageListener() { //vocal
             public void receive(IvyClient client, String[] args) {
                 switch(etat){
                     case croix:
-                        System.out.println("Je vais supprimer " + args[0]);
                         suppression(args[0]);
+                        break;
+                    case deplacer:
+                        System.out.println("deplacement");
+                        deplacement(args[0]);
                         break;
                     default:
                         break;
@@ -146,7 +153,6 @@ public class IvyStroke {
         bus.bindMsg("Palette:ResultatTesterPoint x=(.*) y=(.*) nom=(.*)", new IvyMessageListener() { 
             public void receive(IvyClient client, String[] args) {
                 selection.add(args[2]);
-                System.out.println("add "+ args[2] + "a la selection");
             }
         }
         );
@@ -254,6 +260,43 @@ public class IvyStroke {
         } catch (IvyException ex) {
             Logger.getLogger(IvyStroke.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    
+    private void supprimerRectangle(SelectionShape selectionShape,int x,int y) throws IvyException {
+        for (String str : selection) {
+            if (str.charAt(0) == 'R') {
+                bus.sendMsg("Palette:DeplacerObjet nom=" + str + " x=" +x + " y=" + y);
+                selection.clear();
+                break;
+            }
+        }
+
+    }
+    
+    /**
+     * fonction de deplacement
+     * @param arg 
+     */
+    private void deplacement(String objet) {
+        try {
+            System.out.println("Deplacement=" + objet);
+            
+            switch (objet) {
+                case "ce rectangle":
+                    supprimerRectangle(SelectionShape.RECTANGLE,10,10); //TODO BON COORDONNER
+                    break;
+                case "cette ellipse":
+                    
+                    break;
+                case "cet objet":
+                    
+                    break;
+            }
+        } catch (IvyException ex) {
+            Logger.getLogger(IvyStroke.class.getName()).log(Level.SEVERE, null, ex);
+        }
+          
     }
     
 
