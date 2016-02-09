@@ -92,9 +92,11 @@ public class IvyStroke {
                 switch(forme){
                     case "carre":
                         etat=Etat.carrer;
+                        deleteState = false;
                         break;
                     case "oval":
                         etat=Etat.rond;
+                        deleteState = false;
                         break;
                     case "croix":
                         etat=Etat.croix;
@@ -144,6 +146,7 @@ public class IvyStroke {
         bus.bindMsg("Palette:ResultatTesterPoint x=(.*) y=(.*) nom=(.*)", new IvyMessageListener() { 
             public void receive(IvyClient client, String[] args) {
                 selection.add(args[2]);
+                System.out.println("add "+ args[2] + "a la selection");
             }
         }
         );
@@ -153,6 +156,7 @@ public class IvyStroke {
     
         private void suppression(String objet) {
         try {
+            System.out.println("suppression=" + objet);
             switch (objet) {
                 case "ce rectangle":
                     supprimer(SelectionShape.RECTANGLE);
@@ -173,6 +177,7 @@ public class IvyStroke {
     private void supprimer(SelectionShape selectionShape) throws IvyException {
        
         if (!selection.isEmpty() && deleteState==true) {
+            System.out.println("dans le if");
             switch (selectionShape) {
                 case ALL:
                     System.out.println("Tout va disparaitre");
@@ -198,8 +203,9 @@ public class IvyStroke {
                     }
                     break;
             }
+                System.out.println("dehors");
             //on supprime l'objet
-            deleteState = false;
+           
         }
     }
 
@@ -215,7 +221,6 @@ public class IvyStroke {
     }
 
     private void testerObjet() throws IvyException {
-        System.out.println("testeObject()");
         bus.sendMsg("Palette:TesterPoint x=" + (int) dernierPoint.x + " y=" + (int) dernierPoint.y);
     }
     
@@ -228,7 +233,6 @@ public class IvyStroke {
     private void sauvegarderPoint(int x,int y){
         dernierPoint.x = x;
         dernierPoint.y = y;
-          System.out.println("mouse click");
         try {
             testerObjet();
         } catch (IvyException ex) {
