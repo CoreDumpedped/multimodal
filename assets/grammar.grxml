@@ -17,19 +17,13 @@
       <item><ruleref uri="#initialiser"/></item>
 	  <item><ruleref uri="#couleur"/></item>
 	  <item><ruleref uri="#selection"/></item>
-	  <item><ruleref uri="#mafemme"/></item>
     </one-of>          
     <tag>out = rules.latest().text;</tag>
     <ruleref special="GARBAGE" />
   </rule>
-       
-    <rule id="mafemme">
-      <item>Vous connaissez ma femme? </item>
-      <tag>out.text  = "Oui chef"</tag>
-  </rule>
   
   <rule id="initialiser">
-      <item>oh oh du con</item>
+		<item>init</item>
       <tag>out.text  = "Action:" + meta.current().text;</tag>
   </rule>
   
@@ -37,6 +31,9 @@
      <one-of>
       <item>rouge</item>
 	  <item>noir</item>
+	  <item>bleu</item>
+	  <item>jaune</item>
+	  <item>vert</item>
 	     </one-of>
       <tag>out.text  = "Action:couleur=" + meta.current().text;</tag>
   </rule>
