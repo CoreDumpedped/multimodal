@@ -90,7 +90,7 @@ public class IvyStroke {
                 String forme=args[0];   
                 System.out.println("forme reconnue: " + forme);
                 switch(forme){
-                    case "carrer":
+                    case "carre":
                         etat=Etat.carrer;
                         break;
                     case "oval":
@@ -98,6 +98,7 @@ public class IvyStroke {
                         break;
                     case "croix":
                         etat=Etat.croix;
+                        deleteState = true;
                         break;
                     default:
                         System.err.println("j'ai pas comprit la forme");
@@ -126,10 +127,11 @@ public class IvyStroke {
 
         
         // a la reception de cette objet,cette elipse pour la suppression ou deplacement
-        bus.bindMsg("^sra5 Parsed=Action:selection=(.*) Confidence", new IvyMessageListener() { //vocal
+        bus.bindMsg("^sra5 Parsed=Action:selection=(.*) Confidence(.*)", new IvyMessageListener() { //vocal
             public void receive(IvyClient client, String[] args) {
                 switch(etat){
                     case croix:
+                        System.out.println("Je vais supprimer " + args[0]);
                         suppression(args[0]);
                         break;
                     default:
@@ -148,10 +150,32 @@ public class IvyStroke {
         bus.start(null);
     }
 
+    
+        private void suppression(String objet) {
+        try {
+            switch (objet) {
+                case "ce rectangle":
+                    supprimer(SelectionShape.RECTANGLE);
+                    break;
+                case "cette ellipse":
+                    supprimer(SelectionShape.ELLIPSE);
+                    break;
+                case "cet objet":
+                    System.out.println("cet objet va vraiment etre supprimer");
+                    supprimer(SelectionShape.ALL);
+                    break;
+            }
+        } catch (IvyException ie) {
+        }
+    }
+
+    
     private void supprimer(SelectionShape selectionShape) throws IvyException {
+       
         if (!selection.isEmpty() && deleteState==true) {
             switch (selectionShape) {
                 case ALL:
+                    System.out.println("Tout va disparaitre");
                     bus.sendMsg("Palette:SupprimerObjet nom=" + selection.get(0));
                     selection.clear();
                     break;
@@ -175,7 +199,7 @@ public class IvyStroke {
                     break;
             }
             //on supprime l'objet
-            
+            deleteState = false;
         }
     }
 
@@ -228,20 +252,5 @@ public class IvyStroke {
         }
     }
     
-    private void suppression(String objet) {
-        try {
-            switch (objet) {
-                case "ce rectangle":
-                    supprimer(SelectionShape.RECTANGLE);
-                    break;
-                case "cette ellipse":
-                    supprimer(SelectionShape.ELLIPSE);
-                    break;
-                case "cet objet":
-                    supprimer(SelectionShape.ALL);
-            }
-        } catch (IvyException ie) {
-        }
-    }
 
 }
