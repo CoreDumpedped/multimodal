@@ -49,19 +49,19 @@ public class IvyStroke {
     private List<String> selection;
     private boolean objetSelectionner = false;
     private boolean zoneSelectionner = false;
+    private String couleurSelection = "";
     private String nomSelection;
     private boolean deleteState = false;
 
     Recognizer recognizer;
     private Etat etat;
-    Timer tCouleur;
     boolean waitColor = false;
     String chooseColor = "";
 
     public IvyStroke() throws IvyException {
         etat = Etat.init;
         recognizer = new Recognizer();
-
+        chooseColor = "";
         listPoints = new ArrayList<>();
         dernierPoint = new Point(0, 0);
         selection = new ArrayList<>();
@@ -87,15 +87,6 @@ public class IvyStroke {
                 }
             }
         });
-
-        tCouleur = new Timer(10000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                waitColor = false;
-                chooseColor = "";
-            }
-        });
-
         //todo la bonne syntaxd
         bus.bindMsg("^Recognizer:Forme nom=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {
@@ -104,12 +95,12 @@ public class IvyStroke {
                     case "carre":
                         etat = Etat.carrer;
                         waitColor = true;
-                        tCouleur.start();
+                        
                         objetSelectionner = false;
                         zoneSelectionner = false;
                         break;
                     case "oval":
-                        tCouleur.start();
+                        
                         waitColor = true;
                         etat = Etat.rond;
                         objetSelectionner = false;
@@ -147,7 +138,17 @@ public class IvyStroke {
                         case "jaune":
                             chooseColor = "couleurFond=yellow";
                             break;
+                        case "vert" : 
+                            chooseColor = "couleurFond=green";
+                            break;
+                        case "noir" : 
+                            chooseColor = "couleurFond=black";
+                            break;
+                        case "de cette couleur" :
+                            chooseColor = "couleurFond="+couleurSelection;
+                            break;
                         default:
+                            chooseColor = "couleurFond=black";
                             break;
                     }
                 }
@@ -159,7 +160,6 @@ public class IvyStroke {
         //a la reception de ici
         bus.bindMsg("^sra5 Parsed=Action:position(.*)", new IvyMessageListener() { //vocal
             public void receive(IvyClient client, String[] args) {
-                tCouleur.stop();
                 switch (etat) {
                     case carrer:
                         dessineMoiunCarrer();
@@ -202,19 +202,27 @@ public class IvyStroke {
         });
 
         //regarder les objet sous un point      
-        bus.bindMsg("Palette:ResultatTesterPoint x=(.*) y=(.*) nom=(.*)", new IvyMessageListener() {
+        bus.bindMsg("^Palette:ResultatTesterPoint x=(.*) y=(.*) nom=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {
+                System.out.println("resultat tester point");
                 selection.add(args[2]);
+                try {
+                    demandeInfo("cet objet");
+                } catch (IvyException ex) {
+                    Logger.getLogger(IvyStroke.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         );
 
         //recuper les infos sur l'objet selectionner   
-        bus.bindMsg("Palette:Info nom=(.*) x=(.*) y=(.*) lo(.*) ", new IvyMessageListener() {
+        bus.bindMsg("^Palette:Info nom=(.*) x=(.*) y=(.*) longueur=(.*) hauteur=(.*) couleurFond=(.*) ", new IvyMessageListener() {
+            
             public void receive(IvyClient client, String[] args) {
                 pointSelection = new Point(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
                 nomSelection = args[0];
                 objetSelectionner = true;
+                couleurSelection = args[5];
             }
         }
         );

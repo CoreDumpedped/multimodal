@@ -75,6 +75,7 @@ public class IvyRecognizer {
 
         bus.bindMsg("^Palette:MouseReleased x=(.*) y=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {
+               
                 switch (s) {
                     case I:
                         //Impossible
