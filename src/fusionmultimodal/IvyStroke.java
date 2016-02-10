@@ -45,6 +45,7 @@ public class IvyStroke {
     private Stroke s;
     private Template templateEnAttente;
     private Point dernierPoint;
+    private Point positionPoint;
     private Point pointSelection;
     private List<String> selection;
     private boolean objetSelectionner = false;
@@ -52,21 +53,35 @@ public class IvyStroke {
     private String couleurSelection = "";
     private String nomSelection;
     private boolean deleteState = false;
+    
+    Timer globalTimer;
 
     Recognizer recognizer;
     private Etat etat;
-    boolean waitColor = false;
+    boolean timerStart = false;
     String chooseColor = "";
 
     public IvyStroke() throws IvyException {
         etat = Etat.init;
         recognizer = new Recognizer();
         chooseColor = "";
+        positionPoint = new Point(0,0);
         listPoints = new ArrayList<>();
         dernierPoint = new Point(0, 0);
         selection = new ArrayList<>();
         bus = new Ivy("IvyStroke", "IvyStroke Ready", null);
 
+        
+        globalTimer = new Timer(5000, new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dessiner();
+                globalTimer.stop();
+                
+            }
+        });
+        
         bus.bindMsg("^Palette:MouseClicked x=(.*) y=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {
                 switch (etat) {
@@ -93,15 +108,16 @@ public class IvyStroke {
                 String forme = args[0];
                 switch (forme) {
                     case "carre":
+                        globalTimer.start();
                         etat = Etat.carre;
-                        waitColor = true;
-                        
+                        timerStart = true;
+
                         objetSelectionner = false;
                         zoneSelectionner = false;
                         break;
                     case "oval":
-                        
-                        waitColor = true;
+                        globalTimer.start();
+                        timerStart = true;
                         etat = Etat.rond;
                         objetSelectionner = false;
                         zoneSelectionner = false;
@@ -126,7 +142,7 @@ public class IvyStroke {
 
         bus.bindMsg("^sra5 Parsed=Action:couleur=(.*) Confidence", new IvyMessageListener() { //vocal
             public void receive(IvyClient client, String[] args) {
-                if (waitColor) {
+                if (timerStart) {
                     System.out.println("j'ai entendu une couleur alors que je l'attendais : " + args[0]);
                     switch (args[0]) {
                         case "rouge":
@@ -161,11 +177,8 @@ public class IvyStroke {
         bus.bindMsg("^sra5 Parsed=Action:position(.*)", new IvyMessageListener() { //vocal
             public void receive(IvyClient client, String[] args) {
                 switch (etat) {
-                    case carre:
-                        dessineMoiunCarrer();
-                        break;
-                    case rond:
-                        dessineMoiunRond();
+                    case carre: case rond:
+                        positionPoint = dernierPoint;
                         break;
                     case deplacer:
                         zoneSelectionner = true;
@@ -353,6 +366,20 @@ public class IvyStroke {
         }
     }
 
+    private void dessiner() {
+        switch (etat) {
+            case carre :
+                dessineMoiunCarrer();
+                break;
+            case rond :
+                dessineMoiunRond();
+                break;
+        }
+        positionPoint = new Point(0,0);
+        chooseColor = "";
+        boolean timerStart = false;
+    }
+    
     private void dessineMoiunCarrer() {
         try {
             String str = "";
@@ -360,11 +387,11 @@ public class IvyStroke {
                 str = " " + chooseColor;
             }
             System.out.println("couleur : " + chooseColor);
-            bus.sendMsg("Palette:CreerRectangle x=" + dernierPoint.x + " y=" + dernierPoint.y + str);
+            bus.sendMsg("Palette:CreerRectangle x=" + positionPoint.x + " y=" + positionPoint.y + str);
         } catch (IvyException ex) {
             Logger.getLogger(IvyStroke.class.getName()).log(Level.SEVERE, null, ex);
         }
-        chooseColor = "";
+        
     }
 
     private void dessineMoiunRond() {
@@ -377,7 +404,6 @@ public class IvyStroke {
         } catch (IvyException ex) {
             Logger.getLogger(IvyStroke.class.getName()).log(Level.SEVERE, null, ex);
         }
-        chooseColor = "";
     }
 
     /**
