@@ -38,7 +38,7 @@ public class IvyStroke {
     }
 
     private enum Etat {
-        init, carrer, rond, croix, deplacer
+        init, carre, rond, croix, deplacer
     };
 
     private State state = State.run;
@@ -73,7 +73,7 @@ public class IvyStroke {
                     case init:
                         sauvegarderPoint(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
                         break;
-                    case carrer:
+                    case carre:
                         sauvegarderPoint(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
                         break;
                     case croix:
@@ -102,7 +102,7 @@ public class IvyStroke {
                 String forme = args[0];
                 switch (forme) {
                     case "carre":
-                        etat = Etat.carrer;
+                        etat = Etat.carre;
                         waitColor = true;
                         tCouleur.start();
                         objetSelectionner = false;
@@ -160,7 +160,7 @@ public class IvyStroke {
             public void receive(IvyClient client, String[] args) {
                 tCouleur.stop();
                 switch (etat) {
-                    case carrer:
+                    case carre:
                         dessineMoiunCarrer();
                         break;
                     case rond:
@@ -214,6 +214,7 @@ public class IvyStroke {
                 pointSelection = new Point(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
                 nomSelection = args[0];
                 objetSelectionner = true;
+                deplacement();
             }
         }
         );
