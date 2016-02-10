@@ -7,7 +7,6 @@ package fusionmultimodal.recognizer;
 
 import java.util.List;
 import fusionmultimodal.Stroke;
-import fusionmultimodal.Stroke;
 import fusionmultimodal.Template;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -37,8 +36,6 @@ public class Recognizer {
         double dist;
         for (Template t : listTemplate) {
             dist = t.calculDistance(strokeCourant);
-        //    System.out.println("Verification Stroke : distance avec le dessin : "
-         //           + ""+ dist +" minumum : "+ min);
             if (dist < min) {
                 min = dist;
                 closerTemplate = t;
@@ -67,7 +64,6 @@ public class Recognizer {
 
     
     public void addTemplates(Template t){
-         System.out.println("ajout du " + t.nom + "dans la liste");
         listTemplate.add(t);
     }
     
