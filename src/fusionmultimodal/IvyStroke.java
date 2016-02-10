@@ -6,25 +6,18 @@
 package fusionmultimodal;
 
 import fusionmultimodal.recognizer.Recognizer;
-import com.sun.glass.ui.EventLoop;
 import fr.dgac.ivy.Ivy;
 import fr.dgac.ivy.IvyClient;
 import fr.dgac.ivy.IvyException;
 import fr.dgac.ivy.IvyMessageListener;
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.input.DragEvent;
 import javax.swing.Timer;
 
 /**
@@ -37,17 +30,14 @@ public class IvyStroke {
     public List<Point2D.Double> listPoints;
 
     private enum State {
-
         learn, run
     };
 
     private enum SelectionShape {
-
         ALL, RECTANGLE, ELLIPSE
     }
 
     private enum Etat {
-
         init, carrer, rond, croix, deplacer
     };
 
@@ -92,7 +82,6 @@ public class IvyStroke {
                     case rond:
                         sauvegarderPoint(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
                     case deplacer:
-
                         sauvegarderPoint(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
                         break;
                 }
@@ -111,7 +100,6 @@ public class IvyStroke {
         bus.bindMsg("^Recognizer:Forme nom=(.*)", new IvyMessageListener() {
             public void receive(IvyClient client, String[] args) {
                 String forme = args[0];
-                System.out.println("forme reconnue: " + forme);
                 switch (forme) {
                     case "carre":
                         etat = Etat.carrer;
@@ -183,7 +171,6 @@ public class IvyStroke {
                         deplacement();
                         break;
                     default:
-                        System.err.println("NE DEVRAIT PAS ETRE ICI");
                         break;
                 }
             }
@@ -198,7 +185,9 @@ public class IvyStroke {
                         break;
                     case deplacer: {
                         try {
-                            bus.sendMsg("Palette:DemanderInfo nom=" + selection.get(0));
+                            if(!selection.isEmpty()){
+                               bus.sendMsg("Palette:DemanderInfo nom=" + selection.get(0));
+                            }   
                         } catch (IvyException ex) {
                             Logger.getLogger(IvyStroke.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -271,7 +260,6 @@ public class IvyStroke {
 
     private void suppression(String objet) {
         try {
-            System.out.println("suppression=" + objet);
             switch (objet) {
                 case "ce rectangle":
                     System.out.println("ce rectangle va vraiment etre supprimer");
@@ -294,13 +282,11 @@ public class IvyStroke {
         if (!selection.isEmpty() && deleteState == true) {
             switch (selectionShape) {
                 case ALL:
-                    System.out.println("Tout va disparaitre");
                     bus.sendMsg("Palette:SupprimerObjet nom=" + selection.get(0));
                     selection.clear();
                     deleteState = false;
                     break;
                 case RECTANGLE:
-                    System.out.println("searching for rectangle");
                     for (String str : selection) {
                         if (str.charAt(0) == 'R') {
                             bus.sendMsg("Palette:SupprimerObjet nom=" + str);
@@ -311,7 +297,6 @@ public class IvyStroke {
                     }
                     break;
                 case ELLIPSE:
-                    System.out.println("searching for ellpse");
                     for (String str : selection) {
                         if (str.charAt(0) == 'E') {
                             bus.sendMsg("Palette:SupprimerObjet nom=" + str);
@@ -391,7 +376,6 @@ public class IvyStroke {
      * @throws IvyException
      */
     private void deplacerRectangle(int x, int y) throws IvyException {
-        System.out.println("deplacer rectangle");
         for (String str : selection) {
             if (str.charAt(0) == 'R') {
                 bus.sendMsg("Palette:DeplacerObjet nom=" + str + " x=" + x + " y=" + y);
@@ -402,7 +386,6 @@ public class IvyStroke {
     }
 
     private void deplacerEllipse(int x, int y) throws IvyException {
-        System.out.println("deplacer ellipse");
         for (String str : selection) {
             if (str.charAt(0) == 'E') {
                 bus.sendMsg("Palette:DeplacerObjet nom=" + str + " x=" + x + " y=" + y);

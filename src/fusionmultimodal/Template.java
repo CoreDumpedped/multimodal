@@ -5,7 +5,6 @@
  */
 package fusionmultimodal;
 
-import fusionmultimodal.Stroke;
 import java.awt.geom.Point2D;
 import java.io.PrintWriter;
 import java.util.StringTokenizer;
